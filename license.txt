@@ -1,0 +1,8 @@
+Model Information:
+* title:	Rubik's Cube Speed Solving
+* source:	https://sketchfab.com/3d-models/rubiks-cube-speed-solving-7472d2f875fc43bd9ddac4a611cd80ce
+* author:	romullus (https://sketchfab.com/romullus)
+
+Model License:
+* license type:	SKETCHFAB Editorial (https://sketchfab.com/licenses)
+* requirements:	Use only in connection with events that are newsworthy or of public interest
