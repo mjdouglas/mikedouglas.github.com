@@ -1,0 +1,23 @@
+{
+  "name": "rubiks-cube-viewer",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Interactive Rubik's Cube solver using Three.js and Kociemba algorithm",
+  "scripts": {
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "dev": "http-server -p 8080 -c-1 --cors"
+  },
+  "devDependencies": {
+    "vitest": "^1.0.4",
+    "@vitest/browser": "^1.0.4",
+    "@vitest/ui": "^1.0.4",
+    "@vitest/coverage-v8": "^1.0.4",
+    "playwright": "^1.40.1",
+    "three": "^0.160.0",
+    "happy-dom": "^12.10.3",
+    "http-server": "^14.1.1"
+  }
+}

@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Test coverage
+coverage/
+.vitest/
+
+# Local dev
+.DS_Store
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
