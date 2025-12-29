@@ -1,6 +1,6 @@
 # Rubik's Cube Speed Solving Viewer
 
-Interactive Three.js experience that continuously scrambles and solves a GLTF Rubik's Cube. The model is sourced from Sketchfab (“Rubik's Cube Speed Solving” by romullus) and ships with a rig/animation that captures one full solve. The app rewinds the rig to the solved pose, procedurally scrambles the cube, and then animates the reverse solution.
+Interactive Three.js experience that continuously scrambles and solves a GLTF Rubik's Cube. The model is sourced from Sketchfab (“Rubik's Cube Speed Solving” by romullus) and ships with a rig/animation that captures one full solve. The app rewinds the rig to the solved pose, procedurally scrambles the cube, and then animates the optimal Kociemba solution.
 
 ## High-Level Architecture
 
@@ -10,19 +10,18 @@ Interactive Three.js experience that continuously scrambles and solves a GLTF Ru
 - **Model preparation**
   - `applySolvedPoseFromAnimation` walks every animation track, grabs the last keyframe value, and stamps it on the corresponding node (position/rotation/scale). This bakes the mesh into its canonical solved state before the procedural animation runs.
   - `identifyPiecesAndBuildFaceMap` traverses the rig, finds cubie root nodes (centers, edges, corners), and exposes `getPiecesForFace(face)` which executes a live position test (> threshold) for each axis so face membership stays accurate after every twist.
-- **State + solver**
-  - `CubeState` records the moves executed during the scramble.
-  - `SimpleSolver` reverses the recorded scramble, simplifies consecutive face turns, and produces the solution sequence.
+- **Kociemba solver**
+  - `KociembaSolver` wraps the browser builds of [`cubejs`](https://github.com/ldez/cubejs) (`cube.min.js` + `solve.min.js`) which implement Herbert Kociemba’s two-phase algorithm.
+  - The helper lazily calls `Cube.initSolver()` once, then applies each scramble to a new `Cube` instance and returns `cube.solve()`’s optimized solution sequence.
 - **Move execution**
   - `MoveExecutor` turns a face move (e.g., `R'`, `F2`) into an axis + angle, creates a temporary pivot `Group` at the cube origin, parents the relevant cubies to that pivot, rotates it (animated or instant), then restores each cubie to its original parent. This approach preserves piece positions and lets us reuse animation vs. instant rotations.
 - **Animation controller**
   - `CubeAnimationController` coordinates the perpetual loop:
-    1. Reset solver state.
-    2. Generate a 25-move scramble.
-    3. Execute scramble (instant on the first loop so the page opens in a scrambled position, otherwise 100 ms per move).
-    4. Pause (skip on first loop) and compute the optimized reverse solution.
-    5. Animate the solve at 500 ms per move.
-    6. Idle for 2 seconds and repeat.
+    1. Generate a 25-move scramble.
+    2. Execute scramble (instant on the first loop so the page opens in a scrambled position, otherwise 100 ms per move).
+    3. Pause (skip on first loop) and compute the Kociemba solution via `Cube` (`cube.move(...); cube.solve()`).
+    4. Animate the solve at 500 ms per move.
+    5. Idle for 2 seconds and repeat.
 
 ## Key Files
 
