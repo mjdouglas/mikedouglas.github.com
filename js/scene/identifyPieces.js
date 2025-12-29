@@ -11,15 +11,6 @@ export function identifyPiecesAndBuildFaceMap(gltfScene) {
   // Update world matrices first
   gltfScene.updateMatrixWorld(true);
 
-  // Debug: log all node names to see what's actually in the scene
-  const allNames = [];
-  gltfScene.traverse((node) => {
-    if (node.name) {
-      allNames.push(node.name);
-    }
-  });
-  console.log('All node names in scene (first 50):', allNames.slice(0, 50));
-
   // Find all cube pieces (only parent nodes, not meshes or Object nodes)
   gltfScene.traverse((node) => {
     if (node.name &&
@@ -35,8 +26,6 @@ export function identifyPiecesAndBuildFaceMap(gltfScene) {
       allPieces.push(node);
     }
   });
-
-  console.log(`Found ${allPieces.length} cube pieces`);
 
   // Helper to get actual world position (center of bounding box)
   const getPieceWorldPosition = (piece) => {
@@ -62,9 +51,6 @@ export function identifyPiecesAndBuildFaceMap(gltfScene) {
   // Typically pieces are at -1, 0, 1 so threshold should be ~0.5
   const avgMax = (maxX + maxY + maxZ) / 3;
   const threshold = avgMax * 0.4;
-  console.log(`Position range: X=${maxX.toFixed(2)}, Y=${maxY.toFixed(2)}, Z=${maxZ.toFixed(2)}`);
-  console.log(`Using threshold: ${threshold.toFixed(2)}`);
-  console.log(`Piece names found:`, allPieces.map(p => p.name));
 
   const faceSelectors = {
     'R': (pos) => pos.x > threshold,
@@ -80,11 +66,6 @@ export function identifyPiecesAndBuildFaceMap(gltfScene) {
     if (!selector) return [];
     return allPieces.filter(piece => selector(getPieceWorldPosition(piece)));
   };
-
-  const faces = ['R', 'L', 'U', 'D', 'F', 'B'];
-  faces.forEach(face => {
-    console.log(`Face ${face}: ${getPiecesForFace(face).length} pieces`);
-  });
 
   return {
     getPiecesForFace

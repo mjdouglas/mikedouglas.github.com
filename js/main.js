@@ -3,6 +3,11 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { applySolvedPoseFromAnimation } from './scene/applySolvedPose.js';
 import { CubeAnimationController } from './animation/CubeAnimationController.js';
+import { KociembaSolver } from './solver/KociembaSolver.js';
+import { generateScramble } from './solver/generateScramble.js';
+
+// Create solver instance (initialization deferred until after cube renders)
+const globalSolver = new KociembaSolver();
 
 // ==================== THREE.JS SETUP ====================
 
@@ -88,14 +93,30 @@ loader.load(
     // Update all matrices after adding to scene and transforming
     scene.updateMatrixWorld(true);
 
-    // Initialize cube animation controller
-    const cubeController = new CubeAnimationController(model);
+    // Create controller immediately (piece identification is relatively fast)
+    const cubeController = new CubeAnimationController(model, globalSolver);
 
-    // Start continuous scramble/solve loop
-    cubeController.startContinuousLoop();
+    // Execute initial scramble instantly so cube appears scrambled from the start
+    const scramble = generateScramble(25);
+    console.log('Initial scramble:', scramble.join(' '));
+    (async () => {
+      for (const move of scramble) {
+        await cubeController.executor.executeMove(move, 0); // duration=0 for instant
+      }
+      console.log('Rubik\'s Cube loaded successfully!');
 
-    console.log('Rubik\'s Cube loaded successfully!');
-    console.log('Animation controller started');
+      // Now initialize solver after a delay to let the scrambled cube render
+      setTimeout(() => {
+        globalSolver.ensureReady().then(() => {
+          console.log('Kociemba solver initialized');
+          // Start animation loop after solver is ready, passing initial scramble
+          cubeController.startContinuousLoop(scramble);
+          console.log('Animation controller started');
+        }).catch(err => {
+          console.error('Solver initialization failed:', err);
+        });
+      }, 100); // 100ms delay = ~6 frames at 60fps
+    })();
   },
   undefined,
   function (error) {
