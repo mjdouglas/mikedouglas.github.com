@@ -5,9 +5,16 @@ import { applySolvedPoseFromAnimation } from './scene/applySolvedPose.js';
 import { CubeAnimationController } from './animation/CubeAnimationController.js';
 import { KociembaSolver } from './solver/KociembaSolver.js';
 import { generateScramble } from './solver/generateScramble.js';
+import { EntropyLightingController } from './effects/EntropyLightingController.js';
 
 // Create solver instance (initialization deferred until after cube renders)
 const globalSolver = new KociembaSolver();
+
+// Lighting controller (initialized after lights are created)
+let entropyLighting = null;
+
+// Clock for delta time
+const clock = new THREE.Clock();
 
 // ==================== THREE.JS SETUP ====================
 
@@ -67,6 +74,17 @@ const pointLight = new THREE.PointLight(0xffffff, 0.65);
 pointLight.position.set(0, 6, 0);
 scene.add(pointLight);
 
+// Initialize entropy-based lighting controller
+entropyLighting = new EntropyLightingController({
+  ambient: ambientLight,
+  directional: [directionalLight1, directionalLight2, detailLight],
+  point: pointLight
+}, {
+  transitionSpeed: 1.5,    // Smooth transitions
+  flickerIntensity: 0.12,  // Subtle flicker at high entropy
+  flickerSpeed: 6.0        // Flicker frequency
+});
+
 // Load GLTF model
 const loader = new GLTFLoader();
 loader.load(
@@ -96,6 +114,13 @@ loader.load(
     // Create controller immediately (piece identification is relatively fast)
     const cubeController = new CubeAnimationController(model, globalSolver);
 
+    // Connect entropy state to lighting controller
+    cubeController.setEntropyCallback((movesFromSolved, phase) => {
+      if (entropyLighting) {
+        entropyLighting.setEntropyFromMoves(movesFromSolved, 25);
+      }
+    });
+
     // Execute initial scramble instantly so cube appears scrambled from the start
     const scramble = generateScramble(25);
     console.log('Initial scramble:', scramble.join(' '));
@@ -104,6 +129,11 @@ loader.load(
         await cubeController.executor.executeMove(move, 0); // duration=0 for instant
       }
       console.log('Rubik\'s Cube loaded successfully!');
+
+      // Set initial entropy state (cube is scrambled)
+      if (entropyLighting) {
+        entropyLighting.setEntropyFromMoves(scramble.length, 25);
+      }
 
       // Now initialize solver after a delay to let the scrambled cube render
       setTimeout(() => {
@@ -134,6 +164,14 @@ window.addEventListener('resize', () => {
 // Animation loop
 function animate() {
   requestAnimationFrame(animate);
+
+  const deltaTime = clock.getDelta();
+
+  // Update entropy-based lighting effects
+  if (entropyLighting) {
+    entropyLighting.update(deltaTime, renderer);
+  }
+
   controls.update();
   renderer.render(scene, camera);
 }

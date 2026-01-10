@@ -13,6 +13,28 @@ export class CubeAnimationController {
     this.solver = solver || new KociembaSolver();  // Use provided or create new
     this.isRunning = false;
     this.firstCycle = true;
+
+    // Entropy tracking (0 = solved, moves away from solved = higher entropy)
+    this.movesFromSolved = 0;
+    this.onEntropyChange = null; // Callback: (movesFromSolved, phase) => void
+  }
+
+  /**
+   * Set callback for entropy state changes
+   * @param {Function} callback - Called with (movesFromSolved, phase)
+   *   phase: 'scrambling' | 'solving' | 'paused'
+   */
+  setEntropyCallback(callback) {
+    this.onEntropyChange = callback;
+  }
+
+  /**
+   * Emit entropy change event
+   */
+  emitEntropyChange(phase) {
+    if (this.onEntropyChange) {
+      this.onEntropyChange(this.movesFromSolved, phase);
+    }
   }
 
   async startContinuousLoop(initialScramble = null) {
@@ -29,6 +51,9 @@ export class CubeAnimationController {
         if (this.firstCycle && initialScramble) {
           console.log('Using pre-applied scramble:', initialScramble.join(' '));
           executedScramble = initialScramble;
+          // Set initial entropy for pre-applied scramble
+          this.movesFromSolved = initialScramble.length;
+          this.emitEntropyChange('scrambling');
         } else {
           // Generate scramble
           const scramble = generateScramble(25);
@@ -41,11 +66,15 @@ export class CubeAnimationController {
             const success = await this.executor.executeMove(move, scrambleDuration);
             if (success) {
               executedScramble.push(move);
+              // Increment entropy with each scramble move
+              this.movesFromSolved++;
+              this.emitEntropyChange('scrambling');
             }
           }
 
           if (!this.firstCycle) {
             // 3. Brief pause after scramble
+            this.emitEntropyChange('paused');
             await this.sleep(1000);
           }
         }
@@ -57,11 +86,19 @@ export class CubeAnimationController {
         console.log('Solution:', solution.join(' '), `(${solution.length} moves)`);
 
         // 5. Execute solution (normal: 500ms per move)
+        // Estimate moves remaining based on solution length
+        let solveMoveIndex = 0;
         for (const move of solution) {
           await this.executor.executeMove(move, 500);
+          solveMoveIndex++;
+          // Decrease entropy as we solve (estimate remaining disorder)
+          this.movesFromSolved = Math.max(0, solution.length - solveMoveIndex);
+          this.emitEntropyChange('solving');
         }
 
-        // 6. Pause before next cycle
+        // 6. Pause before next cycle (cube is solved, entropy = 0)
+        this.movesFromSolved = 0;
+        this.emitEntropyChange('paused');
         await this.sleep(2000);
 
         this.firstCycle = false;
