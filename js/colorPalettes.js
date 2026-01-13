@@ -32,9 +32,9 @@ export const palettes = {
   },
   ocean: {
     title: 'Deep Blue',
-    song: 'Ocean',
-    artist: 'John Butler Trio',
-    url: 'https://open.spotify.com/track/5Df3cw3hUPPbA295nHvV5X',
+    song: 'Says',
+    artist: 'Nils Frahm',
+    url: 'https://open.spotify.com/track/5626KdflSKfeDK7RJQfSrE',
   },
   aurora: {
     title: 'Northern Lights',
