@@ -14,9 +14,58 @@
         canvas {
             display: block;
         }
+        #palette-info {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+        #palette-info.visible {
+            opacity: 1;
+        }
+        #spotify-embed {
+            border-radius: 12px;
+            transition: opacity 0.3s ease;
+        }
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.3);
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 20px;
+            transition: color 0.2s;
+            z-index: 100;
+        }
+        .nav-arrow:hover {
+            color: rgba(255,255,255,0.7);
+        }
+        #prev-palette { left: 10px; }
+        #next-palette { right: 10px; }
     </style>
 </head>
-<body>
+<body tabindex="-1">
+    <button id="prev-palette" class="nav-arrow">&#8249;</button>
+    <button id="next-palette" class="nav-arrow">&#8250;</button>
+
+    <div id="palette-info">
+        <iframe id="spotify-embed"
+                src=""
+                width="300"
+                height="80"
+                frameBorder="0"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy">
+        </iframe>
+    </div>
+
     <script type="importmap">
         {
             "imports": {
