@@ -33,7 +33,7 @@ const camera = new THREE.PerspectiveCamera(
 );
 const baseCameraPosition = new THREE.Vector3(5, 5, 5);
 const isMobileViewport = window.innerWidth <= 768;
-const mobileZoomFactor = 1.2; // move camera 20% farther back on mobile
+const mobileZoomFactor = 1.4; // move camera 40% farther back on mobile
 camera.position.copy(
   baseCameraPosition.clone().multiplyScalar(isMobileViewport ? mobileZoomFactor : 1)
 );
