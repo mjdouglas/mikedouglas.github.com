@@ -58,7 +58,7 @@ const bloomPass = new UnrealBloomPass(
   0.0    // threshold - no cutoff, all colors bloom
 );
 const baseBloomStrength = 0.3;
-const solvedBloomStrength = 0.4;
+const solvedBloomStrength = 0.45;
 let targetBloomStrength = baseBloomStrength;
 composer.addPass(bloomPass);
 composer.addPass(new OutputPass());
