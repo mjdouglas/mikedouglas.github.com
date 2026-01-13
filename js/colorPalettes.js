@@ -8,9 +8,9 @@ export const palettes = {
   },
   miami: {
     title: 'Vice City Nights',
-    song: "Crockett's Theme",
-    artist: 'Jan Hammer',
-    url: 'https://open.spotify.com/track/5srgpROEtK8KLKQl5FW7Ub',
+    song: 'Midnight City',
+    artist: 'M83',
+    url: 'https://open.spotify.com/track/1eyzqe2QqGZUmfcPZtrIyt',
   },
   synthwave: {
     title: 'Retrowave Dreams',
@@ -20,9 +20,9 @@ export const palettes = {
   },
   neonTokyo: {
     title: 'Akihabara Nights',
-    song: 'Plastic Love',
-    artist: 'Mariya Takeuchi',
-    url: 'https://open.spotify.com/track/6lDtPMDFdiWivhzDqMXgMk',
+    song: 'Flyday Chinatown',
+    artist: 'Yasuha',
+    url: 'https://open.spotify.com/track/2uXlHiOE4o5xHOCiob8DKn',
   },
   sunset: {
     title: 'Golden Hour',
@@ -62,9 +62,9 @@ export const palettes = {
   },
   forest: {
     title: 'Emerald Canopy',
-    song: 'Big Yellow Taxi',
-    artist: 'Joni Mitchell',
-    url: 'https://open.spotify.com/track/6UkMcAA19lTdjs22jtB7o2',
+    song: 'Holocene',
+    artist: 'Bon Iver',
+    url: 'https://open.spotify.com/track/35KiiILklye1JRRctaLUb4',
   },
   galaxy: {
     title: 'Event Horizon',
