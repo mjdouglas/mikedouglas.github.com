@@ -7,12 +7,14 @@ import { identifyPiecesAndBuildFaceMap } from '../scene/identifyPieces.js';
  * Main animation controller - orchestrates scramble/solve loop
  */
 export class CubeAnimationController {
-  constructor(gltfModel, solver = null) {
+  constructor(gltfModel, solver = null, callbacks = {}) {
     this.pieceLocator = identifyPiecesAndBuildFaceMap(gltfModel);
     this.executor = new MoveExecutor(this.pieceLocator, gltfModel);
     this.solver = solver || new KociembaSolver();  // Use provided or create new
     this.isRunning = false;
     this.firstCycle = true;
+    this.onSolved = callbacks.onSolved || (() => {});
+    this.onScrambling = callbacks.onScrambling || (() => {});
   }
 
   async startContinuousLoop(initialScramble = null) {
@@ -61,8 +63,14 @@ export class CubeAnimationController {
           await this.executor.executeMove(move, 500);
         }
 
-        // 6. Pause before next cycle
+        // 6. Cube is now solved - trigger callback
+        this.onSolved();
+
+        // 7. Pause before next cycle
         await this.sleep(2000);
+
+        // 8. About to scramble - trigger callback
+        this.onScrambling();
 
         this.firstCycle = false;
 

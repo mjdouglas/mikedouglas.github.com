@@ -57,6 +57,9 @@ const bloomPass = new UnrealBloomPass(
   0.4,   // radius - how far glow spreads
   0.0    // threshold - no cutoff, all colors bloom
 );
+const baseBloomStrength = 0.3;
+const solvedBloomStrength = 0.4;
+let targetBloomStrength = baseBloomStrength;
 composer.addPass(bloomPass);
 composer.addPass(new OutputPass());
 
@@ -146,7 +149,10 @@ loader.load(
       scene.updateMatrixWorld(true);
 
       // Create controller immediately (piece identification is relatively fast)
-      const cubeController = new CubeAnimationController(model, globalSolver);
+      const cubeController = new CubeAnimationController(model, globalSolver, {
+        onSolved: () => { targetBloomStrength = solvedBloomStrength; },
+        onScrambling: () => { targetBloomStrength = baseBloomStrength; },
+      });
 
       // Execute initial scramble instantly so cube appears scrambled from the start
       const scramble = generateScramble(25);
@@ -192,6 +198,10 @@ window.addEventListener('resize', () => {
 function animate() {
   requestAnimationFrame(animate);
   controls.update();
+
+  // Smoothly animate bloom strength towards target
+  bloomPass.strength += (targetBloomStrength - bloomPass.strength) * 0.05;
+
   composer.render();
 }
 animate();
