@@ -141,7 +141,7 @@ loader.load(
       scene.add(model);
 
       // Update UI with palette info
-      document.title = paletteInfo.title;
+      document.title = `Michael Douglas: ${paletteInfo.title}`;
       document.getElementById('spotify-embed').src = paletteInfo.embedUrl;
       document.getElementById('palette-info').classList.add('visible');
 
@@ -227,7 +227,7 @@ function switchPalette(direction) {
       }
     });
 
-    document.title = paletteInfo.title;
+    document.title = `Michael Douglas: ${paletteInfo.title}`;
 
     // Fade out, change src, fade in after load
     const embed = document.getElementById('spotify-embed');
