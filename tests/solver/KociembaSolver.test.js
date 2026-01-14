@@ -1,11 +1,19 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { KociembaSolver } from '../../js/solver/KociembaSolver.js';
 import { MockCube } from '../fixtures/mockCubejsSolver.js';
+
+// Mock cubejs module
+vi.mock('cubejs', () => ({
+  default: MockCube,
+}));
+
+vi.mock('cubejs/lib/solve', () => ({}));
+
+// Import after mocking
+const { KociembaSolver } = await import('../../js/solver/KociembaSolver.js');
 
 describe('KociembaSolver', () => {
   beforeEach(() => {
     MockCube.reset();
-    global.window = { Cube: MockCube };
   });
 
   it('initializes solver on first call to ensureReady()', async () => {
@@ -28,13 +36,6 @@ describe('KociembaSolver', () => {
     await solver.ensureReady();
 
     expect(initSpy).not.toHaveBeenCalled();
-  });
-
-  it('throws error when window.Cube is not available', async () => {
-    global.window = {};
-    const solver = new KociembaSolver();
-
-    await expect(solver.ensureReady()).rejects.toThrow('cubejs solver failed to load');
   });
 
   it('solves scramble and returns array of moves', async () => {

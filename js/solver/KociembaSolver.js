@@ -1,6 +1,8 @@
+import Cube from 'cubejs';
+import 'cubejs/lib/solve';
+
 /**
  * Wrapper around cubejs' two-phase (Kociemba) solver
- * Depends on global window.Cube from CDN
  */
 export class KociembaSolver {
   constructor() {
@@ -10,13 +12,10 @@ export class KociembaSolver {
 
   async ensureReady() {
     if (this.initialized) return;
-    if (!window.Cube) {
-      throw new Error('cubejs solver failed to load');
-    }
     if (!this.initPromise) {
       // Cube.initSolver() is synchronous but expensive; wrap in a promise for consistent await
       this.initPromise = Promise.resolve().then(() => {
-        window.Cube.initSolver();
+        Cube.initSolver();
         this.initialized = true;
       });
     }
@@ -26,7 +25,7 @@ export class KociembaSolver {
   async solve(scrambleMoves) {
     await this.ensureReady();
     const scrambleString = scrambleMoves.join(' ');
-    const cube = new window.Cube();
+    const cube = new Cube();
     cube.move(scrambleString);
     const solutionString = cube.solve();
     return solutionString
