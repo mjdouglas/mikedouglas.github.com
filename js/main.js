@@ -141,7 +141,6 @@ loader.load(
       scene.add(model);
 
       // Update UI with palette info
-      document.title = `Michael Douglas: ${paletteInfo.title}`;
       document.getElementById('spotify-embed').src = paletteInfo.embedUrl;
       document.getElementById('palette-info').classList.add('visible');
 
@@ -227,7 +226,11 @@ function switchPalette(direction) {
       }
     });
 
-    document.title = `Michael Douglas: ${paletteInfo.title}`;
+    // Show theme toast briefly
+    const toast = document.getElementById('theme-toast');
+    toast.textContent = paletteInfo.title;
+    toast.classList.add('visible');
+    setTimeout(() => toast.classList.remove('visible'), 2000);
 
     // Fade out, change src, fade in after load
     const embed = document.getElementById('spotify-embed');
