@@ -206,6 +206,7 @@ function animate() {
 animate();
 
 // Palette switching
+let toastTimeout = null;
 function switchPalette(direction) {
   if (!currentModel) return;
 
@@ -230,7 +231,8 @@ function switchPalette(direction) {
     const toast = document.getElementById('theme-toast');
     toast.textContent = paletteInfo.title;
     toast.classList.add('visible');
-    setTimeout(() => toast.classList.remove('visible'), 2000);
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => toast.classList.remove('visible'), 2000);
 
     // Fade out, change src, fade in after load
     const embed = document.getElementById('spotify-embed');
