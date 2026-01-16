@@ -99,6 +99,25 @@
             color: rgba(255,255,255,0.7);
             border-color: rgba(255,255,255,0.4);
         }
+        #contact-btn svg {
+            display: none;
+            width: 18px;
+            height: 18px;
+        }
+        #contact-btn span {
+            display: inline;
+        }
+        @media (max-width: 768px) {
+            #contact-btn {
+                padding: 8px;
+            }
+            #contact-btn svg {
+                display: block;
+            }
+            #contact-btn span {
+                display: none;
+            }
+        }
         #contact-overlay {
             position: fixed;
             inset: 0;
@@ -233,7 +252,12 @@
         <div class="header-title">Michael Douglas</div>
         <div class="header-subtitle">software engineer</div>
     </header>
-    <button id="contact-btn">Contact</button>
+    <button id="contact-btn">
+        <span>Contact</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+    </button>
     <button id="prev-palette" class="nav-arrow">&#8249;</button>
     <button id="next-palette" class="nav-arrow">&#8250;</button>
 
