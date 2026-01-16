@@ -10,6 +10,7 @@ import { CubeAnimationController } from './animation/CubeAnimationController.js'
 import { KociembaSolver } from './solver/KociembaSolver.js';
 import { generateScramble } from './solver/generateScramble.js';
 import { getPaletteInfo, paletteNames, getPaletteNameBySlug, titleToSlug } from './colorPalettes.js';
+import { audioPlayer } from './audioPlayer.js';
 
 // Track current palette for navigation
 function getInitialPaletteIndex() {
@@ -156,7 +157,8 @@ loader.load(
       scene.add(model);
 
       // Update UI with palette info
-      document.getElementById('spotify-embed').src = paletteInfo.embedUrl;
+      audioPlayer.init();
+      audioPlayer.loadTrack(paletteInfo);
       document.getElementById('palette-info').classList.add('visible');
       updateUrlHash(paletteInfo);
 
@@ -258,15 +260,8 @@ function switchPalette(direction) {
 
     updateUrlHash(paletteInfo);
 
-    // Fade out, change src, fade in after load
-    const embed = document.getElementById('spotify-embed');
-    embed.style.opacity = '0';
-    setTimeout(() => {
-      embed.onload = () => {
-        embed.style.opacity = '1';
-      };
-      embed.src = paletteInfo.embedUrl;
-    }, 300);
+    // Load new audio track
+    audioPlayer.loadTrack(paletteInfo);
   });
 }
 
