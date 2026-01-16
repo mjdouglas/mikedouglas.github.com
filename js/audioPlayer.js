@@ -6,6 +6,7 @@ class AudioPlayerController {
     this.isMuted = false;
     this.hasUserInteracted = false;
     this.currentAudioFile = null;
+    this.wasPlayingBeforeHidden = false;
 
     // DOM elements (initialized in init())
     this.muteBtn = null;
@@ -44,6 +45,16 @@ class AudioPlayerController {
 
     // Audio events
     this.audio.addEventListener('error', (e) => this.handleError(e));
+
+    // Pause when page is hidden (e.g., screen off, tab switched)
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        this.wasPlayingBeforeHidden = !this.audio.paused;
+        this.audio.pause();
+      } else if (this.wasPlayingBeforeHidden && this.hasUserInteracted) {
+        this.audio.play().catch(() => {});
+      }
+    });
   }
 
   start() {
