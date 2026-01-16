@@ -80,6 +80,14 @@ export function getRandomPaletteName() {
   return paletteNames[Math.floor(Math.random() * paletteNames.length)];
 }
 
+export function titleToSlug(title) {
+  return title.toLowerCase().replace(/\s+/g, '-');
+}
+
+export function getPaletteNameBySlug(slug) {
+  return paletteNames.find(name => titleToSlug(palettes[name].title) === slug);
+}
+
 export function getSpotifyEmbedUrl(trackUrl) {
   const trackId = trackUrl.split('/track/')[1];
   return `https://open.spotify.com/embed/track/${trackId}`;

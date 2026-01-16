@@ -9,11 +9,26 @@ import { applySolvedPoseFromAnimation } from './scene/applySolvedPose.js';
 import { CubeAnimationController } from './animation/CubeAnimationController.js';
 import { KociembaSolver } from './solver/KociembaSolver.js';
 import { generateScramble } from './solver/generateScramble.js';
-import { getPaletteInfo, paletteNames } from './colorPalettes.js';
+import { getPaletteInfo, paletteNames, getPaletteNameBySlug, titleToSlug } from './colorPalettes.js';
 
 // Track current palette for navigation
-let currentPaletteIndex = Math.floor(Math.random() * paletteNames.length);
+function getInitialPaletteIndex() {
+  const hash = window.location.hash.slice(1);
+  if (hash) {
+    const paletteName = getPaletteNameBySlug(hash);
+    if (paletteName) {
+      return paletteNames.indexOf(paletteName);
+    }
+  }
+  return Math.floor(Math.random() * paletteNames.length);
+}
+let currentPaletteIndex = getInitialPaletteIndex();
 let currentModel = null;
+
+function updateUrlHash(paletteInfo) {
+  const slug = titleToSlug(paletteInfo.title);
+  history.replaceState(null, '', `#${slug}`);
+}
 
 // Create solver instance (initialization deferred until after cube renders)
 const globalSolver = new KociembaSolver();
@@ -143,6 +158,7 @@ loader.load(
       // Update UI with palette info
       document.getElementById('spotify-embed').src = paletteInfo.embedUrl;
       document.getElementById('palette-info').classList.add('visible');
+      updateUrlHash(paletteInfo);
 
       // Update all matrices after adding to scene and transforming
       scene.updateMatrixWorld(true);
@@ -233,6 +249,8 @@ function switchPalette(direction) {
     toast.classList.add('visible');
     clearTimeout(toastTimeout);
     toastTimeout = setTimeout(() => toast.classList.remove('visible'), 2000);
+
+    updateUrlHash(paletteInfo);
 
     // Fade out, change src, fade in after load
     const embed = document.getElementById('spotify-embed');
