@@ -26,6 +26,10 @@ function getInitialPaletteIndex() {
 let currentPaletteIndex = getInitialPaletteIndex();
 let currentModel = null;
 
+// Track whether interstitial is blocking animation start
+const needsInterstitial = localStorage.getItem('audioMuted') !== 'true';
+let pendingAnimationStart = null;
+
 function updateUrlHash(paletteInfo) {
   const slug = titleToSlug(paletteInfo.title);
   history.replaceState(null, '', `#${slug}`);
@@ -185,9 +189,19 @@ loader.load(
         setTimeout(() => {
           globalSolver.ensureReady().then(() => {
             console.log('Kociemba solver initialized');
-            // Start animation loop after solver is ready, passing initial scramble
-            cubeController.startContinuousLoop(scramble);
-            console.log('Animation controller started');
+
+            // Function to start animation loop
+            const startAnimation = () => {
+              cubeController.startContinuousLoop(scramble);
+              console.log('Animation controller started');
+            };
+
+            // If interstitial is blocking, defer animation start
+            if (needsInterstitial) {
+              pendingAnimationStart = startAnimation;
+            } else {
+              startAnimation();
+            }
           }).catch(err => {
             console.error('Solver initialization failed:', err);
           });
@@ -269,21 +283,41 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight') switchPalette(1);
 });
 
-// Interstitial - skip if previously muted
-if (localStorage.getItem('audioMuted') === 'true') {
+// Interstitial handling
+function dismissInterstitial() {
+  const interstitial = document.getElementById('interstitial');
+  if (interstitial.classList.contains('hidden')) return;
+
+  interstitial.classList.add('hidden');
+  audioPlayer.start();
+
+  // Start cube animation if it was waiting
+  if (pendingAnimationStart) {
+    pendingAnimationStart();
+    pendingAnimationStart = null;
+  }
+
+  // Show initial theme toast
+  const paletteInfo = getPaletteInfo(paletteNames[currentPaletteIndex]);
+  const toast = document.getElementById('theme-toast');
+  toast.textContent = paletteInfo.title;
+  toast.classList.remove('visible');
+  void toast.offsetHeight; // Force reflow to restart animation
+  toast.classList.add('visible');
+}
+
+// Skip interstitial if previously muted
+if (!needsInterstitial) {
   document.getElementById('interstitial').classList.add('hidden');
 } else {
-  document.getElementById('interstitial').addEventListener('click', () => {
-    document.getElementById('interstitial').classList.add('hidden');
-    audioPlayer.start();
+  document.getElementById('interstitial').addEventListener('click', dismissInterstitial);
 
-    // Show initial theme toast
-    const paletteInfo = getPaletteInfo(paletteNames[currentPaletteIndex]);
-    const toast = document.getElementById('theme-toast');
-    toast.textContent = paletteInfo.title;
-    toast.classList.remove('visible');
-    void toast.offsetHeight; // Force reflow to restart animation
-    toast.classList.add('visible');
+  // Spacebar also dismisses interstitial
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && !document.getElementById('interstitial').classList.contains('hidden')) {
+      e.preventDefault();
+      dismissInterstitial();
+    }
   });
 }
 

@@ -49,9 +49,10 @@ class AudioPlayerController {
   start() {
     // Called when user dismisses interstitial
     this.hasUserInteracted = true;
-    if (this.currentAudioFile && this.audio.paused) {
-      this.audio.play().catch(() => {});
-    }
+    // iOS Safari requires audio to be "unlocked" during user gesture
+    // Calling load() then play() in the same gesture handler ensures this
+    this.audio.load();
+    this.audio.play().catch(() => {});
   }
 
   async loadTrack(paletteInfo) {
@@ -79,10 +80,20 @@ class AudioPlayerController {
 
     // Attempt autoplay if user has interacted
     if (this.hasUserInteracted) {
-      try {
-        await this.audio.play();
-      } catch (err) {
-        console.log('Autoplay prevented:', err.message);
+      // For iOS: wait for canplay event before attempting play
+      const playWhenReady = () => {
+        this.audio.play().catch(() => {});
+        this.audio.removeEventListener('canplay', playWhenReady);
+      };
+
+      if (this.audio.readyState >= 3) {
+        // Already ready to play
+        this.audio.play().catch((err) => {
+          console.log('Autoplay prevented:', err.message);
+        });
+      } else {
+        // Wait for audio to be ready
+        this.audio.addEventListener('canplay', playWhenReady);
       }
     }
   }
