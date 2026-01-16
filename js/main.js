@@ -269,19 +269,23 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight') switchPalette(1);
 });
 
-// Interstitial click to start
-document.getElementById('interstitial').addEventListener('click', () => {
+// Interstitial - skip if previously muted
+if (localStorage.getItem('audioMuted') === 'true') {
   document.getElementById('interstitial').classList.add('hidden');
-  audioPlayer.start();
+} else {
+  document.getElementById('interstitial').addEventListener('click', () => {
+    document.getElementById('interstitial').classList.add('hidden');
+    audioPlayer.start();
 
-  // Show initial theme toast
-  const paletteInfo = getPaletteInfo(paletteNames[currentPaletteIndex]);
-  const toast = document.getElementById('theme-toast');
-  toast.textContent = paletteInfo.title;
-  toast.classList.remove('visible');
-  void toast.offsetHeight; // Force reflow to restart animation
-  toast.classList.add('visible');
-});
+    // Show initial theme toast
+    const paletteInfo = getPaletteInfo(paletteNames[currentPaletteIndex]);
+    const toast = document.getElementById('theme-toast');
+    toast.textContent = paletteInfo.title;
+    toast.classList.remove('visible');
+    void toast.offsetHeight; // Force reflow to restart animation
+    toast.classList.add('visible');
+  });
+}
 
 // Return focus to main window when mouse moves over canvas
 renderer.domElement.addEventListener('mousemove', () => {

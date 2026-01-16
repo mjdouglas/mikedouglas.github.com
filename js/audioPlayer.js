@@ -30,6 +30,11 @@ class AudioPlayerController {
     // Enable looping
     this.audio.loop = true;
 
+    // Restore mute state from localStorage
+    this.isMuted = localStorage.getItem('audioMuted') === 'true';
+    this.audio.muted = this.isMuted;
+    this.updateMuteState();
+
     this.setupEventListeners();
   }
 
@@ -88,6 +93,9 @@ class AudioPlayerController {
     this.isMuted = !this.isMuted;
     this.audio.muted = this.isMuted;
     this.updateMuteState();
+
+    // Save preference
+    localStorage.setItem('audioMuted', this.isMuted);
 
     // If unmuting and audio isn't playing, start it
     if (!this.isMuted && this.audio.paused) {
