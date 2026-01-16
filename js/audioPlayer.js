@@ -3,29 +3,27 @@
 class AudioPlayerController {
   constructor() {
     this.audio = null;
-    this.isPlaying = false;
+    this.isMuted = false;
     this.hasUserInteracted = false;
     this.currentAudioFile = null;
 
     // DOM elements (initialized in init())
-    this.playPauseBtn = null;
-    this.playIcon = null;
-    this.pauseIcon = null;
+    this.muteBtn = null;
+    this.unmuteIcon = null;
+    this.muteIcon = null;
     this.trackSong = null;
     this.trackArtist = null;
-    this.progressBar = null;
     this.spotifyLink = null;
     this.playerContainer = null;
   }
 
   init() {
     this.audio = document.getElementById('audio-element');
-    this.playPauseBtn = document.getElementById('play-pause-btn');
-    this.playIcon = document.getElementById('play-icon');
-    this.pauseIcon = document.getElementById('pause-icon');
+    this.muteBtn = document.getElementById('mute-btn');
+    this.unmuteIcon = document.getElementById('unmute-icon');
+    this.muteIcon = document.getElementById('mute-icon');
     this.trackSong = document.getElementById('track-song');
     this.trackArtist = document.getElementById('track-artist');
-    this.progressBar = document.getElementById('progress-bar');
     this.spotifyLink = document.getElementById('spotify-link');
     this.playerContainer = document.getElementById('audio-player');
 
@@ -37,13 +35,10 @@ class AudioPlayerController {
   }
 
   setupEventListeners() {
-    // Play/Pause button
-    this.playPauseBtn.addEventListener('click', () => this.togglePlayPause());
+    // Mute/Unmute button
+    this.muteBtn.addEventListener('click', () => this.toggleMute());
 
     // Audio events
-    this.audio.addEventListener('timeupdate', () => this.updateProgress());
-    this.audio.addEventListener('play', () => this.updatePlayState(true));
-    this.audio.addEventListener('pause', () => this.updatePlayState(false));
     this.audio.addEventListener('error', (e) => this.handleError(e));
   }
 
@@ -51,6 +46,10 @@ class AudioPlayerController {
     // Track first user interaction for autoplay policy
     const markInteracted = () => {
       this.hasUserInteracted = true;
+      // Try to play if we have a track loaded
+      if (this.currentAudioFile && this.audio.paused) {
+        this.audio.play().catch(() => {});
+      }
       document.removeEventListener('click', markInteracted);
       document.removeEventListener('keydown', markInteracted);
     };
@@ -65,9 +64,6 @@ class AudioPlayerController {
     this.trackSong.textContent = song;
     this.trackArtist.textContent = artist;
     this.spotifyLink.href = url;
-
-    // Reset progress
-    this.progressBar.style.width = '0%';
 
     // Handle missing audio file
     if (!audioFile) {
@@ -90,34 +86,26 @@ class AudioPlayerController {
         await this.audio.play();
       } catch (err) {
         console.log('Autoplay prevented:', err.message);
-        // User will need to click play manually
       }
     }
   }
 
-  togglePlayPause() {
+  toggleMute() {
     if (!this.currentAudioFile) return;
 
-    if (this.isPlaying) {
-      this.audio.pause();
-    } else {
-      this.audio.play().catch(err => {
-        console.log('Play failed:', err.message);
-      });
+    this.isMuted = !this.isMuted;
+    this.audio.muted = this.isMuted;
+    this.updateMuteState();
+
+    // If unmuting and audio isn't playing, start it
+    if (!this.isMuted && this.audio.paused) {
+      this.audio.play().catch(() => {});
     }
   }
 
-  updatePlayState(playing) {
-    this.isPlaying = playing;
-    this.playIcon.style.display = playing ? 'none' : 'block';
-    this.pauseIcon.style.display = playing ? 'block' : 'none';
-  }
-
-  updateProgress() {
-    if (this.audio.duration) {
-      const percent = (this.audio.currentTime / this.audio.duration) * 100;
-      this.progressBar.style.width = `${percent}%`;
-    }
+  updateMuteState() {
+    this.unmuteIcon.style.display = this.isMuted ? 'none' : 'block';
+    this.muteIcon.style.display = this.isMuted ? 'block' : 'none';
   }
 
   handleError(e) {
