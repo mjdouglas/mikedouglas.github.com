@@ -1,20 +1,41 @@
 // Web Worker for Rubik's cube solver
-// Runs cubejs initialization and solving off the main thread
+// Loads pre-computed tables for instant initialization
 
 import Cube from 'cubejs';
 import 'cubejs/lib/solve';
 
 let initialized = false;
 
-self.onmessage = (e) => {
+self.onmessage = async (e) => {
   const { type, id } = e.data;
 
   if (type === 'init') {
-    // Initialize the solver (builds lookup tables - expensive operation)
     const startTime = performance.now();
-    Cube.initSolver();
-    const elapsed = performance.now() - startTime;
-    console.log(`Solver initialization took ${elapsed.toFixed(0)}ms`);
+
+    try {
+      // Try to load pre-computed tables
+      const response = await fetch('/solver-tables.json');
+      if (response.ok) {
+        const tables = await response.json();
+        Cube.moveTables = tables.moveTables;
+        Cube.pruningTables = tables.pruningTables;
+        const elapsed = performance.now() - startTime;
+        console.log(`Solver tables loaded in ${elapsed.toFixed(0)}ms`);
+      } else {
+        // Fall back to computing tables if file not found
+        console.log('Pre-computed tables not found, computing...');
+        Cube.initSolver();
+        const elapsed = performance.now() - startTime;
+        console.log(`Solver initialization took ${elapsed.toFixed(0)}ms`);
+      }
+    } catch (err) {
+      // Fall back to computing tables on error
+      console.log('Failed to load tables, computing...', err.message);
+      Cube.initSolver();
+      const elapsed = performance.now() - startTime;
+      console.log(`Solver initialization took ${elapsed.toFixed(0)}ms`);
+    }
+
     initialized = true;
     self.postMessage({ type: 'ready', id });
   } else if (type === 'solve') {
@@ -25,13 +46,10 @@ self.onmessage = (e) => {
 
     try {
       const { scrambleMoves } = e.data;
-      console.log('Worker received solve request, id:', id, 'moves:', scrambleMoves.length);
       const scrambleString = scrambleMoves.join(' ');
       const cube = new Cube();
       cube.move(scrambleString);
-      console.log('Worker solving...');
       const solutionString = cube.solve();
-      console.log('Worker solved, solution length:', solutionString.length);
       const solution = solutionString
         .trim()
         .split(/\s+/)

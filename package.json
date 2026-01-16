@@ -11,7 +11,8 @@
     "test": "vitest --run",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "generate:solver-tables": "node scripts/generate-solver-tables.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
