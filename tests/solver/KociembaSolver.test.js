@@ -1,12 +1,55 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { MockCube } from '../fixtures/mockCubejsSolver.js';
 
-// Mock cubejs module
-vi.mock('cubejs', () => ({
-  default: MockCube,
-}));
+// Mock Worker class for Node.js environment
+class MockWorker {
+  constructor() {
+    this.onmessage = null;
+    this.messageHandlers = [];
+  }
 
-vi.mock('cubejs/lib/solve', () => ({}));
+  postMessage(data) {
+    // Simulate async worker response
+    setTimeout(() => {
+      if (data.type === 'init') {
+        MockCube.initSolver();
+        if (this.onmessage) {
+          this.onmessage({ data: { type: 'ready', id: data.id } });
+        }
+      } else if (data.type === 'solve') {
+        const cube = new MockCube();
+        cube.move(data.scrambleMoves.join(' '));
+        const solutionString = cube.solve();
+        const solution = solutionString.trim().split(/\s+/).filter(Boolean);
+        if (this.onmessage) {
+          this.onmessage({ data: { type: 'solution', id: data.id, solution } });
+        }
+      }
+    }, 0);
+  }
+
+  addEventListener(event, handler) {
+    this.messageHandlers.push(handler);
+  }
+
+  removeEventListener(event, handler) {
+    this.messageHandlers = this.messageHandlers.filter(h => h !== handler);
+  }
+}
+
+// Mock global Worker
+vi.stubGlobal('Worker', MockWorker);
+
+// Mock URL constructor for worker imports
+vi.stubGlobal('URL', class extends URL {
+  constructor(path, base) {
+    if (typeof path === 'string' && path.includes('worker')) {
+      super('file:///mock-worker.js');
+    } else {
+      super(path, base);
+    }
+  }
+});
 
 // Import after mocking
 const { KociembaSolver } = await import('../../js/solver/KociembaSolver.js');

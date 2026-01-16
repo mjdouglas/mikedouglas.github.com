@@ -187,8 +187,10 @@ loader.load(
 
         // Now initialize solver after a delay to let the scrambled cube render
         setTimeout(() => {
+          const solverStartTime = performance.now();
           globalSolver.ensureReady().then(() => {
-            console.log('Kociemba solver initialized');
+            const solverElapsed = performance.now() - solverStartTime;
+            console.log(`Kociemba solver initialized (${solverElapsed.toFixed(0)}ms total)`);
 
             // Function to start animation loop
             const startAnimation = () => {
@@ -196,10 +198,15 @@ loader.load(
               console.log('Animation controller started');
             };
 
-            // If interstitial is blocking, defer animation start
-            if (needsInterstitial) {
+            // Check if interstitial is still visible or was already dismissed
+            const interstitial = document.getElementById('interstitial');
+            const interstitialDismissed = !interstitial || interstitial.classList.contains('hidden');
+
+            if (needsInterstitial && !interstitialDismissed) {
+              // Interstitial still showing - defer animation start
               pendingAnimationStart = startAnimation;
             } else {
+              // No interstitial needed, or already dismissed - start now
               startAnimation();
             }
           }).catch(err => {
