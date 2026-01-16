@@ -49,10 +49,27 @@ class AudioPlayerController {
   start() {
     // Called when user dismisses interstitial
     this.hasUserInteracted = true;
-    // iOS Safari requires audio to be "unlocked" during user gesture
-    // Calling load() then play() in the same gesture handler ensures this
-    this.audio.load();
-    this.audio.play().catch(() => {});
+
+    // Don't try to play if no audio file is loaded
+    if (!this.currentAudioFile) return;
+
+    // iOS Safari: must call play() directly in gesture handler
+    // If audio is ready, play immediately; otherwise wait for canplay
+    const attemptPlay = () => {
+      this.audio.play().catch((err) => {
+        console.log('Play failed:', err.message);
+      });
+    };
+
+    if (this.audio.readyState >= 2) {
+      // HAVE_CURRENT_DATA or better - ready to play
+      attemptPlay();
+    } else {
+      // Wait for audio to be ready, but also try playing immediately
+      // (iOS sometimes needs the play() call in the gesture handler even if it fails)
+      attemptPlay();
+      this.audio.addEventListener('canplay', attemptPlay, { once: true });
+    }
   }
 
   async loadTrack(paletteInfo) {
