@@ -16,3 +16,4 @@ coverage/
 *.swo
 dist
 test-results/
+screenshots/
