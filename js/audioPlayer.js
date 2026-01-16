@@ -31,7 +31,6 @@ class AudioPlayerController {
     this.audio.loop = true;
 
     this.setupEventListeners();
-    this.trackUserInteraction();
   }
 
   setupEventListeners() {
@@ -42,19 +41,12 @@ class AudioPlayerController {
     this.audio.addEventListener('error', (e) => this.handleError(e));
   }
 
-  trackUserInteraction() {
-    // Track first user interaction for autoplay policy
-    const markInteracted = () => {
-      this.hasUserInteracted = true;
-      // Try to play if we have a track loaded
-      if (this.currentAudioFile && this.audio.paused) {
-        this.audio.play().catch(() => {});
-      }
-      document.removeEventListener('click', markInteracted);
-      document.removeEventListener('keydown', markInteracted);
-    };
-    document.addEventListener('click', markInteracted);
-    document.addEventListener('keydown', markInteracted);
+  start() {
+    // Called when user dismisses interstitial
+    this.hasUserInteracted = true;
+    if (this.currentAudioFile && this.audio.paused) {
+      this.audio.play().catch(() => {});
+    }
   }
 
   async loadTrack(paletteInfo) {

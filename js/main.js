@@ -162,11 +162,6 @@ loader.load(
       document.getElementById('palette-info').classList.add('visible');
       updateUrlHash(paletteInfo);
 
-      // Show theme toast on initial load
-      const toast = document.getElementById('theme-toast');
-      toast.textContent = paletteInfo.title;
-      toast.classList.add('visible');
-      setTimeout(() => toast.classList.remove('visible'), 2000);
 
       // Update all matrices after adding to scene and transforming
       scene.updateMatrixWorld(true);
@@ -230,7 +225,6 @@ function animate() {
 animate();
 
 // Palette switching
-let toastTimeout = null;
 function switchPalette(direction) {
   if (!currentModel) return;
 
@@ -254,9 +248,9 @@ function switchPalette(direction) {
     // Show theme toast briefly
     const toast = document.getElementById('theme-toast');
     toast.textContent = paletteInfo.title;
+    toast.classList.remove('visible');
+    void toast.offsetHeight; // Force reflow to restart animation
     toast.classList.add('visible');
-    clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(() => toast.classList.remove('visible'), 2000);
 
     updateUrlHash(paletteInfo);
 
@@ -273,6 +267,20 @@ document.getElementById('next-palette').addEventListener('click', () => switchPa
 window.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') switchPalette(-1);
   if (e.key === 'ArrowRight') switchPalette(1);
+});
+
+// Interstitial click to start
+document.getElementById('interstitial').addEventListener('click', () => {
+  document.getElementById('interstitial').classList.add('hidden');
+  audioPlayer.start();
+
+  // Show initial theme toast
+  const paletteInfo = getPaletteInfo(paletteNames[currentPaletteIndex]);
+  const toast = document.getElementById('theme-toast');
+  toast.textContent = paletteInfo.title;
+  toast.classList.remove('visible');
+  void toast.offsetHeight; // Force reflow to restart animation
+  toast.classList.add('visible');
 });
 
 // Return focus to main window when mouse moves over canvas
