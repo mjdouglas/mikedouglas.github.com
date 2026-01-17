@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Michael Douglas | Software Engineer</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -103,31 +104,6 @@
         }
         #audio-player.no-audio .player-btn {
             cursor: not-allowed;
-        }
-        #interstitial {
-            position: fixed;
-            inset: 0;
-            background: rgba(26, 26, 26, 0.85);
-            z-index: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-        #interstitial.hidden {
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease;
-        }
-        #interstitial-prompt {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.7rem;
-            letter-spacing: 0.2em;
-            color: rgba(255,255,255,0.7);
-            text-transform: uppercase;
-            padding: 12px 24px;
-            border: 1px solid rgba(255,255,255,0.4);
-            border-radius: 4px;
         }
         #theme-toast {
             font-family: 'Orbitron', sans-serif;
@@ -360,9 +336,6 @@
     </style>
 </head>
 <body tabindex="-1">
-    <div id="interstitial">
-        <div id="interstitial-prompt">click to start</div>
-    </div>
     <header id="site-header">
         <div class="header-title">Michael Douglas</div>
         <div class="header-subtitle">software engineer</div>
