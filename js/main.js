@@ -2,15 +2,20 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
-import { applySolvedPoseFromAnimation } from './scene/applySolvedPose.js';
 import { CubeAnimationController } from './animation/CubeAnimationController.js';
-import { KociembaSolver } from './solver/KociembaSolver.js';
-import { generateScramble } from './solver/generateScramble.js';
-import { getPaletteInfo, paletteNames, getPaletteNameBySlug, titleToSlug } from './colorPalettes.js';
 import { audioPlayer } from './audioPlayer.js';
+import {
+  getPaletteInfo,
+  getPaletteNameBySlug,
+  paletteNames,
+  titleToSlug,
+} from './colorPalettes.js';
+import { applySolvedPoseFromAnimation } from './scene/applySolvedPose.js';
+import { generateScramble } from './solver/generateScramble.js';
+import { KociembaSolver } from './solver/KociembaSolver.js';
 
 // Track current palette for navigation
 function getInitialPaletteIndex() {
@@ -45,13 +50,15 @@ const camera = new THREE.PerspectiveCamera(
   45,
   window.innerWidth / window.innerHeight,
   0.1,
-  1000
+  1000,
 );
 const baseCameraPosition = new THREE.Vector3(5, 5, 5);
 const isMobileViewport = window.innerWidth <= 768;
 const mobileZoomFactor = 1.6; // move camera 60% farther back on mobile
 camera.position.copy(
-  baseCameraPosition.clone().multiplyScalar(isMobileViewport ? mobileZoomFactor : 1)
+  baseCameraPosition
+    .clone()
+    .multiplyScalar(isMobileViewport ? mobileZoomFactor : 1),
 );
 
 // Renderer setup
@@ -69,9 +76,9 @@ composer.addPass(new RenderPass(scene, camera));
 
 const bloomPass = new UnrealBloomPass(
   new THREE.Vector2(window.innerWidth, window.innerHeight),
-  0.3,   // strength - glow intensity
-  0.4,   // radius - how far glow spreads
-  0.0    // threshold - no cutoff, all colors bloom
+  0.3, // strength - glow intensity
+  0.4, // radius - how far glow spreads
+  0.0, // threshold - no cutoff, all colors bloom
 );
 const baseBloomStrength = 0.3;
 const solvedBloomStrength = 0.45;
@@ -112,7 +119,7 @@ scene.add(pointLight);
 const loader = new GLTFLoader();
 loader.load(
   'scene.gltf',
-  function (gltf) {
+  (gltf) => {
     const model = gltf.scene;
 
     // Use embedded animation to move cube into solved pose
@@ -162,14 +169,17 @@ loader.load(
       document.getElementById('palette-info').classList.add('visible');
       updateUrlHash(paletteInfo);
 
-
       // Update all matrices after adding to scene and transforming
       scene.updateMatrixWorld(true);
 
       // Create controller immediately (piece identification is relatively fast)
       const cubeController = new CubeAnimationController(model, globalSolver, {
-        onSolved: () => { targetBloomStrength = solvedBloomStrength; },
-        onScrambling: () => { targetBloomStrength = baseBloomStrength; },
+        onSolved: () => {
+          targetBloomStrength = solvedBloomStrength;
+        },
+        onScrambling: () => {
+          targetBloomStrength = baseBloomStrength;
+        },
       });
 
       // Execute initial scramble instantly so cube appears scrambled from the start
@@ -179,29 +189,34 @@ loader.load(
         for (const move of scramble) {
           await cubeController.executor.executeMove(move, 0); // duration=0 for instant
         }
-        console.log('Rubik\'s Cube loaded successfully!');
+        console.log("Rubik's Cube loaded successfully!");
 
         // Now initialize solver after a delay to let the scrambled cube render
         setTimeout(() => {
           const solverStartTime = performance.now();
-          globalSolver.ensureReady().then(() => {
-            const solverElapsed = performance.now() - solverStartTime;
-            console.log(`Kociemba solver initialized (${solverElapsed.toFixed(0)}ms total)`);
+          globalSolver
+            .ensureReady()
+            .then(() => {
+              const solverElapsed = performance.now() - solverStartTime;
+              console.log(
+                `Kociemba solver initialized (${solverElapsed.toFixed(0)}ms total)`,
+              );
 
-            // Start animation loop
-            cubeController.startContinuousLoop(scramble);
-            console.log('Animation controller started');
-          }).catch(err => {
-            console.error('Solver initialization failed:', err);
-          });
+              // Start animation loop
+              cubeController.startContinuousLoop(scramble);
+              console.log('Animation controller started');
+            })
+            .catch((err) => {
+              console.error('Solver initialization failed:', err);
+            });
         }, 100); // 100ms delay = ~6 frames at 60fps
       })();
     });
   },
   undefined,
-  function (error) {
+  (error) => {
     console.error('Error loading model:', error);
-  }
+  },
 );
 
 // Handle window resize
@@ -231,7 +246,9 @@ animate();
 function switchPalette(direction) {
   if (!currentModel) return;
 
-  currentPaletteIndex = (currentPaletteIndex + direction + paletteNames.length) % paletteNames.length;
+  currentPaletteIndex =
+    (currentPaletteIndex + direction + paletteNames.length) %
+    paletteNames.length;
   const paletteInfo = getPaletteInfo(paletteNames[currentPaletteIndex]);
 
   const textureLoader = new THREE.TextureLoader();
@@ -263,8 +280,12 @@ function switchPalette(direction) {
 }
 
 // Button controls
-document.getElementById('prev-palette').addEventListener('click', () => switchPalette(-1));
-document.getElementById('next-palette').addEventListener('click', () => switchPalette(1));
+document
+  .getElementById('prev-palette')
+  .addEventListener('click', () => switchPalette(-1));
+document
+  .getElementById('next-palette')
+  .addEventListener('click', () => switchPalette(1));
 
 // Keyboard controls
 window.addEventListener('keydown', (e) => {

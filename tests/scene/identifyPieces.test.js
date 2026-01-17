@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { identifyPiecesAndBuildFaceMap } from '../../js/scene/identifyPieces.js';
 import { createFullMockCubeScene } from '../fixtures/mockGltfScene.js';
 
@@ -28,7 +28,7 @@ describe('identifyPiecesAndBuildFaceMap', () => {
 
     const faces = ['R', 'L', 'U', 'D', 'F', 'B'];
 
-    faces.forEach(face => {
+    faces.forEach((face) => {
       const pieces = pieceLocator.getPiecesForFace(face);
 
       // Each face should have 9 pieces in a full cube
@@ -44,7 +44,7 @@ describe('identifyPiecesAndBuildFaceMap', () => {
     const rightPieces = pieceLocator.getPiecesForFace('R');
 
     // All pieces should have positive x position > threshold
-    rightPieces.forEach(piece => {
+    rightPieces.forEach((piece) => {
       expect(piece.position.x).toBeGreaterThan(0.3);
     });
   });
@@ -56,7 +56,7 @@ describe('identifyPiecesAndBuildFaceMap', () => {
     const leftPieces = pieceLocator.getPiecesForFace('L');
 
     // All pieces should have negative x position < -threshold
-    leftPieces.forEach(piece => {
+    leftPieces.forEach((piece) => {
       expect(piece.position.x).toBeLessThan(-0.3);
     });
   });

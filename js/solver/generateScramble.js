@@ -10,9 +10,12 @@ export function generateScramble(length = 25) {
   let lastFace = null;
 
   const oppositeFace = {
-    'R': 'L', 'L': 'R',
-    'U': 'D', 'D': 'U',
-    'F': 'B', 'B': 'F'
+    R: 'L',
+    L: 'R',
+    U: 'D',
+    D: 'U',
+    F: 'B',
+    B: 'F',
   };
 
   while (scramble.length < length) {

@@ -3,8 +3,8 @@
 
 import Cube from 'cubejs';
 import 'cubejs/lib/solve.js';
-import { writeFileSync } from 'fs';
-import { join } from 'path';
+import { writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 console.log('Initializing solver (this takes ~7 seconds)...');
 const startTime = performance.now();

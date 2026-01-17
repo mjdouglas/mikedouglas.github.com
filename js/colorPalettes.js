@@ -97,7 +97,9 @@ export function titleToSlug(title) {
 }
 
 export function getPaletteNameBySlug(slug) {
-  return paletteNames.find(name => titleToSlug(palettes[name].title) === slug);
+  return paletteNames.find(
+    (name) => titleToSlug(palettes[name].title) === slug,
+  );
 }
 
 export function getPaletteInfo(paletteName = null) {

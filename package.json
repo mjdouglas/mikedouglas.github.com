@@ -12,9 +12,13 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "test:e2e": "playwright test",
+    "lint": "biome check",
+    "lint:fix": "biome check --write",
+    "format": "biome format --write",
     "generate:solver-tables": "node scripts/generate-solver-tables.js"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.3.11",
     "@playwright/test": "^1.57.0",
     "@vitest/browser": "^1.0.4",
     "@vitest/coverage-v8": "^1.0.4",

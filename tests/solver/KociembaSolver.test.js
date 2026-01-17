@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MockCube } from '../fixtures/mockCubejsSolver.js';
 
 // Mock Worker class for Node.js environment
@@ -28,12 +28,12 @@ class MockWorker {
     }, 0);
   }
 
-  addEventListener(event, handler) {
+  addEventListener(_event, handler) {
     this.messageHandlers.push(handler);
   }
 
-  removeEventListener(event, handler) {
-    this.messageHandlers = this.messageHandlers.filter(h => h !== handler);
+  removeEventListener(_event, handler) {
+    this.messageHandlers = this.messageHandlers.filter((h) => h !== handler);
   }
 }
 
@@ -41,15 +41,18 @@ class MockWorker {
 vi.stubGlobal('Worker', MockWorker);
 
 // Mock URL constructor for worker imports
-vi.stubGlobal('URL', class extends URL {
-  constructor(path, base) {
-    if (typeof path === 'string' && path.includes('worker')) {
-      super('file:///mock-worker.js');
-    } else {
-      super(path, base);
+vi.stubGlobal(
+  'URL',
+  class extends URL {
+    constructor(path, base) {
+      if (typeof path === 'string' && path.includes('worker')) {
+        super('file:///mock-worker.js');
+      } else {
+        super(path, base);
+      }
     }
-  }
-});
+  },
+);
 
 // Import after mocking
 const { KociembaSolver } = await import('../../js/solver/KociembaSolver.js');

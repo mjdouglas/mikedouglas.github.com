@@ -13,15 +13,16 @@ export function identifyPiecesAndBuildFaceMap(gltfScene) {
 
   // Find all cube pieces (only parent nodes, not meshes or Object nodes)
   gltfScene.traverse((node) => {
-    if (node.name &&
-        !node.name.includes('_Rubik_0') &&
-        !node.name.startsWith('Object_') &&
-        (node.name.startsWith('R2.Center_') ||
-         node.name.startsWith('R2.Corner_') ||
-         node.name.startsWith('R2.Edge_') ||
-         node.name.startsWith('R2Center_') ||
-         node.name.startsWith('R2Corner_') ||
-         node.name.startsWith('R2Edge_'))
+    if (
+      node.name &&
+      !node.name.includes('_Rubik_0') &&
+      !node.name.startsWith('Object_') &&
+      (node.name.startsWith('R2.Center_') ||
+        node.name.startsWith('R2.Corner_') ||
+        node.name.startsWith('R2.Edge_') ||
+        node.name.startsWith('R2Center_') ||
+        node.name.startsWith('R2Corner_') ||
+        node.name.startsWith('R2Edge_'))
     ) {
       allPieces.push(node);
     }
@@ -40,8 +41,10 @@ export function identifyPiecesAndBuildFaceMap(gltfScene) {
   const positions = allPieces.map(getPieceWorldPosition);
 
   // Find the range of positions to determine threshold
-  let maxX = 0, maxY = 0, maxZ = 0;
-  positions.forEach(pos => {
+  let maxX = 0,
+    maxY = 0,
+    maxZ = 0;
+  positions.forEach((pos) => {
     maxX = Math.max(maxX, Math.abs(pos.x));
     maxY = Math.max(maxY, Math.abs(pos.y));
     maxZ = Math.max(maxZ, Math.abs(pos.z));
@@ -53,21 +56,21 @@ export function identifyPiecesAndBuildFaceMap(gltfScene) {
   const threshold = avgMax * 0.4;
 
   const faceSelectors = {
-    'R': (pos) => pos.x > threshold,
-    'L': (pos) => pos.x < -threshold,
-    'U': (pos) => pos.y > threshold,
-    'D': (pos) => pos.y < -threshold,
-    'F': (pos) => pos.z > threshold,
-    'B': (pos) => pos.z < -threshold
+    R: (pos) => pos.x > threshold,
+    L: (pos) => pos.x < -threshold,
+    U: (pos) => pos.y > threshold,
+    D: (pos) => pos.y < -threshold,
+    F: (pos) => pos.z > threshold,
+    B: (pos) => pos.z < -threshold,
   };
 
   const getPiecesForFace = (face) => {
     const selector = faceSelectors[face];
     if (!selector) return [];
-    return allPieces.filter(piece => selector(getPieceWorldPosition(piece)));
+    return allPieces.filter((piece) => selector(getPieceWorldPosition(piece)));
   };
 
   return {
-    getPiecesForFace
+    getPiecesForFace,
   };
 }

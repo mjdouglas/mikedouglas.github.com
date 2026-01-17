@@ -8,8 +8,8 @@ export function applySolvedPoseFromAnimation(model, animations) {
     return;
   }
 
-  animations.forEach(clip => {
-    clip.tracks.forEach(track => {
+  animations.forEach((clip) => {
+    clip.tracks.forEach((track) => {
       const nameParts = track.name.split('.');
       if (nameParts.length < 2) return;
 

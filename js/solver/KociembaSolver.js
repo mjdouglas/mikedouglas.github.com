@@ -10,10 +10,9 @@ export class KociembaSolver {
     this.pendingMessages = new Map();
 
     // Create worker using Vite's worker import syntax
-    this.worker = new Worker(
-      new URL('./solver.worker.js', import.meta.url),
-      { type: 'module' }
-    );
+    this.worker = new Worker(new URL('./solver.worker.js', import.meta.url), {
+      type: 'module',
+    });
 
     // Handle messages from worker
     this.worker.onmessage = (e) => {
@@ -27,7 +26,12 @@ export class KociembaSolver {
           this.pendingMessages.delete(id);
         }
       } else if (type === 'solution') {
-        console.log('Received solution from worker, id:', id, 'moves:', e.data.solution.length);
+        console.log(
+          'Received solution from worker, id:',
+          id,
+          'moves:',
+          e.data.solution.length,
+        );
         const resolve = this.pendingMessages.get(id);
         if (resolve) {
           resolve(e.data.solution);
@@ -66,7 +70,12 @@ export class KociembaSolver {
     await this.ensureReady();
 
     const id = this.messageId++;
-    console.log('Sending solve request to worker, id:', id, 'moves:', scrambleMoves.length);
+    console.log(
+      'Sending solve request to worker, id:',
+      id,
+      'moves:',
+      scrambleMoves.length,
+    );
     return new Promise((resolve) => {
       this.pendingMessages.set(id, resolve);
       this.worker.postMessage({ type: 'solve', id, scrambleMoves });

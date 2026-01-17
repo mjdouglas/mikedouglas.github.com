@@ -44,7 +44,7 @@ export class MoveExecutor {
 
     // Reparent pieces to pivot temporarily
     const originalParents = new Map();
-    pieces.forEach(piece => {
+    pieces.forEach((piece) => {
       originalParents.set(piece, piece.parent);
       pivot.attach(piece);
     });
@@ -53,7 +53,7 @@ export class MoveExecutor {
     await this.animatePivotRotation(pivot, this.AXES[face], angle, duration);
 
     // Restore parents
-    pieces.forEach(piece => {
+    pieces.forEach((piece) => {
       const parent = originalParents.get(piece);
       parent.attach(piece);
     });
@@ -66,9 +66,9 @@ export class MoveExecutor {
     return new Promise((resolve) => {
       const startTime = performance.now();
       const startQuat = pivot.quaternion.clone();
-      const targetQuat = startQuat.clone().multiply(
-        new THREE.Quaternion().setFromAxisAngle(axis, angle)
-      );
+      const targetQuat = startQuat
+        .clone()
+        .multiply(new THREE.Quaternion().setFromAxisAngle(axis, angle));
 
       if (duration <= 0) {
         pivot.quaternion.copy(targetQuat).normalize();
@@ -96,6 +96,6 @@ export class MoveExecutor {
   }
 
   easeInOutCubic(t) {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
   }
 }

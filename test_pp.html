@@ -33,7 +33,7 @@
   function testConnection() {
     var timer = setTimeout(reportError, 5000);
     var ws = new WebSocket('ws://marlin3-ws.getduel.com/auth/test');
-    ws.onmessage = function () {
+    ws.onmessage = () => {
       clearTimeout(timer);
       reportSuccess();
     };

@@ -1,8 +1,12 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, beforeEach } from 'vitest';
+
 import * as THREE from 'three';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { MoveExecutor } from '../../js/animation/MoveExecutor.js';
-import { createMockCubeScene, createMockPieceLocator } from '../fixtures/mockGltfScene.js';
+import {
+  createMockCubeScene,
+  createMockPieceLocator,
+} from '../fixtures/mockGltfScene.js';
 
 describe('MoveExecutor', () => {
   let executor;
@@ -55,7 +59,7 @@ describe('MoveExecutor', () => {
     it('returns values between 0 and 1 for inputs between 0 and 1', () => {
       const testValues = [0.1, 0.25, 0.75, 0.9];
 
-      testValues.forEach(t => {
+      testValues.forEach((t) => {
         const result = executor.easeInOutCubic(t);
         expect(result).toBeGreaterThanOrEqual(0);
         expect(result).toBeLessThanOrEqual(1);

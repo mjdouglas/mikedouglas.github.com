@@ -426,7 +426,7 @@
     </div>
 
     <script>
-        (function() {
+        (() => {
             const contactBtn = document.getElementById('contact-btn');
             const overlay = document.getElementById('contact-overlay');
             const modal = document.getElementById('contact-modal');
@@ -454,18 +454,18 @@
             contactBtn.addEventListener('click', openContact);
             overlay.addEventListener('click', closeContact);
 
-            document.addEventListener('keydown', function(e) {
+            document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     closeContact();
                 }
             });
 
-            document.querySelectorAll('.copy-btn').forEach(function(btn) {
-                btn.addEventListener('click', function() {
+            document.querySelectorAll('.copy-btn').forEach((btn) => {
+                btn.addEventListener('click', () => {
                     const email = btn.dataset.email;
-                    navigator.clipboard.writeText(email).then(function() {
+                    navigator.clipboard.writeText(email).then(() => {
                         btn.classList.add('copied');
-                        setTimeout(function() {
+                        setTimeout(() => {
                             btn.classList.remove('copied');
                         }, 1500);
                     });

@@ -12,7 +12,7 @@ export function createMockCubeScene() {
   // Create a single piece for testing
   const piece = new THREE.Mesh(
     new THREE.BoxGeometry(1, 1, 1),
-    new THREE.MeshBasicMaterial()
+    new THREE.MeshBasicMaterial(),
   );
   piece.name = 'R2.Corner_FRU';
   piece.position.set(1, 1, 1);
@@ -26,10 +26,10 @@ export function createMockCubeScene() {
  */
 export function createMockPieceLocator(pieces) {
   return {
-    getPiecesForFace: (face) => {
+    getPiecesForFace: (_face) => {
       // Simple mock: return all pieces for any face
       return pieces;
-    }
+    },
   };
 }
 
@@ -53,7 +53,7 @@ export function createFullMockCubeScene() {
   positions.forEach((pos, i) => {
     const mesh = new THREE.Mesh(
       new THREE.BoxGeometry(0.9, 0.9, 0.9),
-      new THREE.MeshBasicMaterial()
+      new THREE.MeshBasicMaterial(),
     );
     mesh.name = `R2.Corner_${i}`;
     mesh.position.set(...pos);

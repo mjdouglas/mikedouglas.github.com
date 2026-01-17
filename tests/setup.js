@@ -11,6 +11,6 @@ if (typeof requestAnimationFrame === 'undefined') {
 // Mock performance.now() for timing tests
 if (typeof performance === 'undefined') {
   global.performance = {
-    now: () => Date.now()
+    now: () => Date.now(),
   };
 }

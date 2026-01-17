@@ -1,7 +1,7 @@
+import { identifyPiecesAndBuildFaceMap } from '../scene/identifyPieces.js';
 import { generateScramble } from '../solver/generateScramble.js';
 import { KociembaSolver } from '../solver/KociembaSolver.js';
 import { MoveExecutor } from './MoveExecutor.js';
-import { identifyPiecesAndBuildFaceMap } from '../scene/identifyPieces.js';
 
 /**
  * Main animation controller - orchestrates scramble/solve loop
@@ -10,7 +10,7 @@ export class CubeAnimationController {
   constructor(gltfModel, solver = null, callbacks = {}) {
     this.pieceLocator = identifyPiecesAndBuildFaceMap(gltfModel);
     this.executor = new MoveExecutor(this.pieceLocator, gltfModel);
-    this.solver = solver || new KociembaSolver();  // Use provided or create new
+    this.solver = solver || new KociembaSolver(); // Use provided or create new
     this.isRunning = false;
     this.firstCycle = true;
     this.onSolved = callbacks.onSolved || (() => {});
@@ -40,7 +40,10 @@ export class CubeAnimationController {
           const scrambleDuration = this.firstCycle ? 0 : 100;
           executedScramble = [];
           for (const move of scramble) {
-            const success = await this.executor.executeMove(move, scrambleDuration);
+            const success = await this.executor.executeMove(
+              move,
+              scrambleDuration,
+            );
             if (success) {
               executedScramble.push(move);
             }
@@ -56,7 +59,11 @@ export class CubeAnimationController {
         console.log('Solving cube with Kociemba...');
         const scrambleForSolver = executedScramble;
         const solution = await this.solver.solve(scrambleForSolver);
-        console.log('Solution:', solution.join(' '), `(${solution.length} moves)`);
+        console.log(
+          'Solution:',
+          solution.join(' '),
+          `(${solution.length} moves)`,
+        );
 
         // 5. Execute solution (normal: 500ms per move)
         for (const move of solution) {
@@ -73,7 +80,6 @@ export class CubeAnimationController {
         this.onScrambling();
 
         this.firstCycle = false;
-
       } catch (error) {
         console.error('Error in animation loop:', error);
         await this.sleep(5000); // Wait before retry
@@ -82,7 +88,7 @@ export class CubeAnimationController {
   }
 
   sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   stop() {

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { generateScramble } from '../../js/solver/generateScramble.js';
 
 describe('generateScramble', () => {
@@ -11,7 +11,7 @@ describe('generateScramble', () => {
     const scramble = generateScramble(50);
     const validFaces = ['R', 'L', 'U', 'D', 'F', 'B'];
 
-    scramble.forEach(move => {
+    scramble.forEach((move) => {
       const face = move[0];
       expect(validFaces).toContain(face);
     });
@@ -21,7 +21,7 @@ describe('generateScramble', () => {
     const scramble = generateScramble(50);
     const validModifiers = ['', "'", '2'];
 
-    scramble.forEach(move => {
+    scramble.forEach((move) => {
       const modifier = move.slice(1);
       expect(validModifiers).toContain(modifier);
     });
@@ -40,9 +40,12 @@ describe('generateScramble', () => {
   it('avoids consecutive opposite-face moves', () => {
     const scramble = generateScramble(100);
     const oppositeFace = {
-      'R': 'L', 'L': 'R',
-      'U': 'D', 'D': 'U',
-      'F': 'B', 'B': 'F'
+      R: 'L',
+      L: 'R',
+      U: 'D',
+      D: 'U',
+      F: 'B',
+      B: 'F',
     };
 
     for (let i = 1; i < scramble.length; i++) {

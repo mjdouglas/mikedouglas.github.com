@@ -50,10 +50,7 @@ self.onmessage = async (e) => {
       const cube = new Cube();
       cube.move(scrambleString);
       const solutionString = cube.solve();
-      const solution = solutionString
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean);
+      const solution = solutionString.trim().split(/\s+/).filter(Boolean);
 
       self.postMessage({ type: 'solution', id, solution });
     } catch (err) {
