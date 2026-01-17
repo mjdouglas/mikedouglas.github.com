@@ -26,10 +26,6 @@ function getInitialPaletteIndex() {
 let currentPaletteIndex = getInitialPaletteIndex();
 let currentModel = null;
 
-// Track whether interstitial is blocking animation start
-const needsInterstitial = localStorage.getItem('audioMuted') !== 'true';
-let pendingAnimationStart = null;
-
 function updateUrlHash(paletteInfo) {
   const slug = titleToSlug(paletteInfo.title);
   history.replaceState(null, '', `#${slug}`);
@@ -192,23 +188,9 @@ loader.load(
             const solverElapsed = performance.now() - solverStartTime;
             console.log(`Kociemba solver initialized (${solverElapsed.toFixed(0)}ms total)`);
 
-            // Function to start animation loop
-            const startAnimation = () => {
-              cubeController.startContinuousLoop(scramble);
-              console.log('Animation controller started');
-            };
-
-            // Check if interstitial is still visible or was already dismissed
-            const interstitial = document.getElementById('interstitial');
-            const interstitialDismissed = !interstitial || interstitial.classList.contains('hidden');
-
-            if (needsInterstitial && !interstitialDismissed) {
-              // Interstitial still showing - defer animation start
-              pendingAnimationStart = startAnimation;
-            } else {
-              // No interstitial needed, or already dismissed - start now
-              startAnimation();
-            }
+            // Start animation loop
+            cubeController.startContinuousLoop(scramble);
+            console.log('Animation controller started');
           }).catch(err => {
             console.error('Solver initialization failed:', err);
           });
@@ -289,44 +271,6 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') switchPalette(-1);
   if (e.key === 'ArrowRight') switchPalette(1);
 });
-
-// Interstitial handling
-function dismissInterstitial() {
-  const interstitial = document.getElementById('interstitial');
-  if (interstitial.classList.contains('hidden')) return;
-
-  interstitial.classList.add('hidden');
-  audioPlayer.start();
-
-  // Start cube animation if it was waiting
-  if (pendingAnimationStart) {
-    pendingAnimationStart();
-    pendingAnimationStart = null;
-  }
-
-  // Show initial theme toast
-  const paletteInfo = getPaletteInfo(paletteNames[currentPaletteIndex]);
-  const toast = document.getElementById('theme-toast');
-  toast.textContent = paletteInfo.title;
-  toast.classList.remove('visible');
-  void toast.offsetHeight; // Force reflow to restart animation
-  toast.classList.add('visible');
-}
-
-// Skip interstitial if previously muted
-if (!needsInterstitial) {
-  document.getElementById('interstitial').classList.add('hidden');
-} else {
-  document.getElementById('interstitial').addEventListener('click', dismissInterstitial);
-
-  // Spacebar also dismisses interstitial
-  window.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' && !document.getElementById('interstitial').classList.contains('hidden')) {
-      e.preventDefault();
-      dismissInterstitial();
-    }
-  });
-}
 
 // Return focus to main window when mouse moves over canvas
 renderer.domElement.addEventListener('mousemove', () => {

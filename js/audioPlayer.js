@@ -3,8 +3,8 @@
 class AudioPlayerController {
   constructor() {
     this.audio = null;
-    this.isMuted = false;
-    this.hasUserInteracted = false;
+    this.isMuted = true;
+    this.hasUserInteracted = true;
     this.currentAudioFile = null;
     this.wasPlayingBeforeHidden = false;
 
@@ -31,9 +31,8 @@ class AudioPlayerController {
     // Enable looping
     this.audio.loop = true;
 
-    // Restore mute state from localStorage
-    this.isMuted = localStorage.getItem('audioMuted') === 'true';
-    this.audio.muted = this.isMuted;
+    // Always start muted
+    this.audio.muted = true;
     this.updateMuteState();
 
     this.setupEventListeners();
@@ -55,15 +54,6 @@ class AudioPlayerController {
         this.audio.play().catch(() => {});
       }
     });
-  }
-
-  start() {
-    // Called when user dismisses interstitial
-    this.hasUserInteracted = true;
-    // iOS Safari requires audio to be "unlocked" during user gesture
-    // Calling load() then play() in the same gesture handler ensures this
-    this.audio.load();
-    this.audio.play().catch(() => {});
   }
 
   async loadTrack(paletteInfo) {
@@ -115,9 +105,6 @@ class AudioPlayerController {
     this.isMuted = !this.isMuted;
     this.audio.muted = this.isMuted;
     this.updateMuteState();
-
-    // Save preference
-    localStorage.setItem('audioMuted', this.isMuted);
 
     // If unmuting and audio isn't playing, start it
     if (!this.isMuted && this.audio.paused) {
