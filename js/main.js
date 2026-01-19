@@ -55,10 +55,11 @@ const camera = new THREE.PerspectiveCamera(
 const baseCameraPosition = new THREE.Vector3(5, 5, 5);
 const isMobileViewport = window.innerWidth <= 768;
 const mobileZoomFactor = 1.6; // move camera 60% farther back on mobile
+const desktopZoomFactor = 1.18; // move camera back to make cube 15% smaller
 camera.position.copy(
   baseCameraPosition
     .clone()
-    .multiplyScalar(isMobileViewport ? mobileZoomFactor : 1),
+    .multiplyScalar(isMobileViewport ? mobileZoomFactor : desktopZoomFactor),
 );
 
 // Renderer setup
