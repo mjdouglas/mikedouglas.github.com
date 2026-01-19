@@ -4,6 +4,9 @@
   "type": "module",
   "private": true,
   "description": "Interactive Rubik's Cube solver using Three.js and Kociemba algorithm",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

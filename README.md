@@ -2,6 +2,10 @@
 
 Interactive Three.js experience that continuously scrambles and solves a GLTF Rubik's Cube. The model is sourced from Sketchfab (“Rubik's Cube Speed Solving” by romullus) and ships with a rig/animation that captures one full solve. The app rewinds the rig to the solved pose, procedurally scrambles the cube, and then animates the optimal Kociemba solution.
 
+## Requirements
+
+- Node.js 18 or newer (matches the minimum supported version for Vite/Vitest)
+
 ## High-Level Architecture
 
 - **Three.js scene setup**
