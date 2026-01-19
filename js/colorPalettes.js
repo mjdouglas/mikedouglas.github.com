@@ -88,8 +88,12 @@ export const palettes = {
 
 export const paletteNames = Object.keys(palettes);
 
+const randomEligiblePalettes = paletteNames.filter((name) => name !== 'candy');
+
 export function getRandomPaletteName() {
-  return paletteNames[Math.floor(Math.random() * paletteNames.length)];
+  return randomEligiblePalettes[
+    Math.floor(Math.random() * randomEligiblePalettes.length)
+  ];
 }
 
 export function titleToSlug(title) {

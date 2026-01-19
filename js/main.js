@@ -169,6 +169,11 @@ loader.load(
       document.getElementById('palette-info').classList.add('visible');
       updateUrlHash(paletteInfo);
 
+      // Show theme toast on initial load
+      const toast = document.getElementById('theme-toast');
+      toast.textContent = paletteInfo.title;
+      toast.classList.add('visible');
+
       // Update all matrices after adding to scene and transforming
       scene.updateMatrixWorld(true);
 
