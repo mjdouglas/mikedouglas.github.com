@@ -18,6 +18,7 @@ import { generateScramble } from './solver/generateScramble.js';
 import { KociembaSolver } from './solver/KociembaSolver.js';
 
 // Track current palette for navigation
+const hadInitialHash = window.location.hash.length > 1;
 function getInitialPaletteIndex() {
   const hash = window.location.hash.slice(1);
   if (hash) {
@@ -168,7 +169,9 @@ loader.load(
       audioPlayer.init();
       audioPlayer.loadTrack(paletteInfo);
       document.getElementById('palette-info').classList.add('visible');
-      updateUrlHash(paletteInfo);
+      if (hadInitialHash) {
+        updateUrlHash(paletteInfo);
+      }
 
       // Show theme toast on initial load
       const toast = document.getElementById('theme-toast');
